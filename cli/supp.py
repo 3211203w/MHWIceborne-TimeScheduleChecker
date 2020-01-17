@@ -30,12 +30,12 @@ def displayOption(soup):
                 checkEvent(soup, challengeMission)
             elif re == str(4):
                 leave = True
-                print('Press Enter to say Goodbye.')
+                print('按Enter離開', end='')
                 input()
                 exit()
             else:
-                print('Input error.')
-                print('Please try again.')
+                print('輸入錯誤.')
+                print('請重新嘗試.\n')
                 valid = False
     
 
@@ -63,7 +63,7 @@ def checkRaid(soup):
     else:
         print('沒有可以遊玩的多人副本戰役')
 
-    print('Press Enter to go back.', end = '')
+    print('按Enter返回', end = '')
     input()
 
 # check playable event mission
@@ -80,10 +80,10 @@ def checkEvent(soup, missionList):
         valid = False
 
         if page != 1:
-            print('[,]\tLast page')
+            print('[,]\t上一頁')
         if page != max_page:
-            print('[.]\tNext page')
-        print('[0]\tBack to home screen.\n')
+            print('[.]\t下一頁')
+        print('[0]\t回到主頁\n')
         
         while not valid:
             valid = True
@@ -106,8 +106,8 @@ def checkEvent(soup, missionList):
                 valid = False
             
             if not valid:
-                print('Input error.')
-                print('Please try again.')
+                print('輸入錯誤.')
+                print('請重新嘗試.\n')
         
         if usrInput == ',':
             page -= 1
@@ -178,5 +178,5 @@ def checkEvent_DisplayEventDetail(no, missionList):
     print('任務名稱:\n' + missionList[no][0] + '\n')
     print('可供遊玩時段:\n' + missionList[no][1] + '\n')
     print('任務詳情:\n' + missionList[no][2] + '\n')
-    print('Press Enter to go back')
+    print('按Enter返回', end='')
     input()
