@@ -3,10 +3,11 @@ import os
 
 # leave the first item blank
 eventMission = [['Title', 'Period', 'Detail']]
-#challengeMission = [['Title', 'Period', 'Detail']]
+challengeMission = [['Title', 'Period', 'Detail']]
 
 def displayOption(soup):
     leave = False
+    checkEvent_ImportData(soup)
 
     while not leave:
         os.system('cls' if os.name == 'nt' else 'clear')
@@ -24,9 +25,9 @@ def displayOption(soup):
             if re == str(1):
                 checkRaid(soup)
             elif re == str(2):
-                checkEvent(soup)
+                checkEvent(soup, eventMission) #type 0 = event, type 1 = challengeMission
             elif re == str(3):
-                checkChallenge(soup)
+                checkEvent(soup, challengeMission)
             elif re == str(4):
                 leave = True
                 print('Press Enter to say Goodbye.')
@@ -66,17 +67,16 @@ def checkRaid(soup):
     input()
 
 # check playable event mission
-def checkEvent(soup):
-    checkEvent_ImportData(soup)
+def checkEvent(soup, missionList):
 
     usrInput = 'NotZero'
     page = 1
-    max_page = (len(eventMission) // 10) + 1
+    max_page = (len(missionList) // 10) + 1
 
     while usrInput != '0':
         # display page 1 by default
         os.system('cls' if os.name == 'nt' else 'clear')
-        checkEvent_DisplayEvent(page)
+        checkEvent_DisplayEvent(page, missionList)
         valid = False
 
         if page != 1:
@@ -91,7 +91,7 @@ def checkEvent(soup):
             usrInput = input()
 
             # option list
-            numberSet = list(range(len(eventMission)))
+            numberSet = list(range(len(missionList)))
             for i in range(len(numberSet)):
                 numberSet[i] = str(numberSet[i])
             
@@ -121,57 +121,62 @@ def checkEvent(soup):
             break
 
         else:
-            checkEvent_DisplayEventDetail(int(usrInput))
+            checkEvent_DisplayEventDetail(int(usrInput), missionList)
             
 def checkEvent_ImportData(soup):
-    temp = soup.find(class_='table2').find_all(class_='quest')
+    # declare empty mission list
+    missionList = None
 
-    # record events to arrays
-    counter = 0
-    for i in temp[1:]:
-        # event no.
-        counter += 1
-        
-        # reserve new space for an event
-        eventMission.append([])
-        
-        # record event title
-        eventMission[counter].append(i.find(class_='title').text.strip())
-        
-        # record event period
-        if len(i.find(class_='terms').text[4:].strip()) > 25:
-            firstPeriod = i.find(class_='terms').text[4:].strip()[:25].strip()
-            secondPeriod = i.find(class_='terms').text[4:].strip()[26:].strip()
-            eventMission[counter].append(firstPeriod + '\n' +secondPeriod)
-        
-        else:
-            eventMission[counter].append(i.find(class_='terms').text[4:].strip()[:25])
+    for missionType in range(2):
+        if missionType == 0:
+            temp = soup.find(class_='table2').find_all(class_='quest')
+            missionList = eventMission
+        elif missionType == 1:
+            temp = soup.find(class_='table3').find_all(class_='quest')
+            missionList = challengeMission
 
-        # record event detail
-        eventMission[counter].append(i.find(class_='txt').text.strip())
+        # record events to arrays
+        counter = 0
+        for i in temp[1:]:
+            # event no.
+            counter += 1
+            
+            # reserve new space for an event
+            missionList.append([])
 
-def checkEvent_DisplayEvent(page):
+            # record event title
+            missionList[counter].append(i.find(class_='title').text.strip())
+            
+            # record event period
+            if len(i.find(class_='terms').text[4:].strip()) > 25:
+                firstPeriod = i.find(class_='terms').text[4:].strip()[:25].strip()
+                secondPeriod = i.find(class_='terms').text[4:].strip()[26:].strip()
+                missionList[counter].append(firstPeriod + '\n' +secondPeriod)
+            
+            else:
+                missionList[counter].append(i.find(class_='terms').text[4:].strip()[:25])
+
+            # record event detail
+            missionList[counter].append(i.find(class_='txt').text.strip())
+
+def checkEvent_DisplayEvent(page, missionList):
     delta = (page - 1) * 10
-    print('總共有' + str(len(eventMission)-1) + '個活動任務.')
+    print('總共有' + str(len(missionList)-1) + '個活動任務.')
 
-    if 10 + delta > len(eventMission):
-        print('正顯示第 ' + str( 1 + delta) + ' 至第 ' + str(len(eventMission)) + '個活動任務\n')
-        for i in range(11 + delta)[ 1 + delta: len(eventMission)]:
-            print('[' + str(i) + ']\t' + eventMission[i][0])
+    if 10 + delta > len(missionList):
+        print('正顯示第 ' + str( 1 + delta) + ' 至第 ' + str(len(missionList)) + '個活動任務\n')
+        for i in range(11 + delta)[ 1 + delta: len(missionList)]:
+            print('[' + str(i) + ']\t' + missionList[i][0])
 
     else:
         print('正顯示第 ' + str( 1 + delta) + ' 至第 ' + str(10 + delta) + '個活動任務\n')
         for i in range(11 + delta)[ 1 + delta:]:
-            print('[' + str(i) + ']\t' + eventMission[i][0])
+            print('[' + str(i) + ']\t' + missionList[i][0])
 
-def checkEvent_DisplayEventDetail(no):
+def checkEvent_DisplayEventDetail(no, missionList):
     os.system('cls' if os.name == 'nt' else 'clear')
-    print('任務名稱:\n' + eventMission[no][0] + '\n')
-    print('可供遊玩時段:\n' + eventMission[no][1] + '\n')
-    print('任務詳情:\n' + eventMission[no][2] + '\n')
+    print('任務名稱:\n' + missionList[no][0] + '\n')
+    print('可供遊玩時段:\n' + missionList[no][1] + '\n')
+    print('任務詳情:\n' + missionList[no][2] + '\n')
     print('Press Enter to go back')
     input()
-
-# check playable challenging mission
-def checkChallenge(soup):
-    return
